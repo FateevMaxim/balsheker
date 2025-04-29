@@ -102,6 +102,11 @@ class ProductController extends Controller
             $city_value = 'Получено на складе в Екібастұз';
             $city = 'Алмалы';
             $reg_field = 'reg_city';
+        }elseif (Auth::user()->type === 'pavlodarin'){
+            $city_field = 'to_city';
+            $city_value = 'Получено на складе в Павлодаре';
+            $city = 'Павлодар';
+            $reg_field = 'reg_city';
         }
 
         foreach ($array as $ar){
