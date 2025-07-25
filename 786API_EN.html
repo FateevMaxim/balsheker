@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>786 API Documentation</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        h1, h2, h3 { color: #2c3e50; }
+        code { background-color: #ecf0f1; padding: 2px 6px; border-radius: 4px; }
+        pre { background-color: #f4f4f4; padding: 10px; overflow-x: auto; }
+        table { border-collapse: collapse; width: 100%; margin-bottom: 20px; }
+        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+        .section { margin-bottom: 40px; }
+        .code-block {
+            background-color: #2d2d2d;
+            color: #f8f8f2;
+            padding: 10px;
+            overflow-x: auto;
+            font-family: monospace;
+        }
+        .key-table thead tr { background-color: #f0f0f0; }
+    </style>
+</head>
+<body>
+
+<h1>🌐 786 API Documentation</h1>
+
+<section class="section">
+    <h2>🔐 Authentication and Signature</h2>
+    <p>To prevent malicious tampering during API calls, each request must include a <strong>signature (sign)</strong>. The server will verify this signature, and any requests with invalid signatures will be rejected.</p>
+
+    <h3>✅ Supported Signature Algorithm: <code>MD5</code></h3>
+    <p>Signature Generation Steps:</p>
+    <ol>
+        <li>Merge all request parameters (including public and business parameters).</li>
+        <li>Sort the parameters by key name in ASCII order.</li>
+        <li>Concatenate key-value pairs as <code>key1value1key2value2...</code> without any separators.</li>
+        <li>Prepend and append the <code>client_secret</code> to the concatenated string.</li>
+        <li>Apply MD5 hashing to the final string and convert the result to uppercase.</li>
+    </ol>
+
+    <h3>PHP Example:</h3>
+    <div class="code-block">
+
+$get = $this->request->get();<br/>
+$post = $this->request->post();<br/>
+$parameter = array_merge($get, $post);<br/>
+ksort($parameter, SORT_NATURAL | SORT_FLAG_CASE);<br/>
+
+$client_secret = "XXXXXX";<br/>
+$sign_parts = [];<br/>
+$sign_parts[] = $client_secret;<br/>
+
+foreach ($parameter as $k => $v) {<br/>
+    $sign_parts[] = "{$k}{$v}";<br/>
+}<br/>
+
+$sign_parts[] = $client_secret;<br/>
+$sign_string = implode("", $sign_parts);<br/>
+$sign = strtoupper(md5($sign_string));<br/>
+
+    </div>
+</section>
+
+<section class="section">
+    <h2>📋 Public Parameters</h2>
+    <table>
+        <thead>
+        <tr>
+            <th>Parameter</th><th>Example Value</th><th>Type</th><th>Required</th><th>Description</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr><td>account_key</td><td>HT381lsmunts3geyew</td><td>string</td><td>Yes</td><td>Account identification key</td></tr>
+        <tr><td>sign</td><td>666A2E0C13266CEEE2CF634D625C37</td><td>string</td><td>Yes</td><td>MD5 generated signature</td></tr>
+        <tr><td>operating_time</td><td>1752120624</td><td>number</td><td>Yes</td><td>Timestamp of operation</td></tr>
+        <tr><td>lang</td><td>zh/kk/ru</td><td>string</td><td>Yes</td><td>language</td></tr>
+        </tbody>
+    </table>
+</section>
+
+<section class="section">
+    <h2>📡 Base URL</h2>
+    <ul>
+        <li><strong>Test Environment:</strong> <code>https://test.cargo786.com/</code></li>
+        <li><strong>Production Environment:</strong> <code>https://pod.cargo786.com/</code></li>
+    </ul>
+</section>
+
+<section class="section">
+    <h2>🔑 Client Credentials</h2>
+    <h3>BAL +780161285</h3>
+    <table class="key-table">
+        <thead>
+        <tr>
+            <th>Parameter</th><th>Value</th><th>Description</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr><td>account_key</td><td>HTad4l5jyfjdotgdsp</td><td>Account Key for BAL</td></tr>
+        <tr><td>client_secret</td><td>FFA9BC040DE9F05F27370FB4275D9F8D</td><td>Client Secret for BAL</td></tr>
+        </tbody>
+    </table>
+
+    <h3>ORDA +77079615201</h3>
+    <table class="key-table">
+        <thead>
+        <tr>
+            <th>Parameter</th><th>Value</th><th>Description</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr><td>account_key</td><td>HTe34w3lm6otsbeth5</td><td>Account Key for ORDA</td></tr>
+        <tr><td>client_secret</td><td>C90A2F4B25C5E3EA017833CD289E1B7C</td><td>Client Secret for ORDA</td></tr>
+        </tbody>
+    </table>
+</section>
+
+<section class="section">
+    <h2>1. 📝 Create Member (Register User)</h2>
+    <ul>
+        <li><strong>URL:</strong> <code>/appsapi/createMember</code></li>
+        <li><strong>Method:</strong> POST</li>
+        <li><strong>Content-Type:</strong> form-data</li>
+    </ul>
+
+    <h3>Request Body:</h3>
+    <table>
+        <thead>
+        <tr><th>Parameter</th><th>Example Value</th><th>Type</th><th>Required</th><th>Description</th></tr>
+        </thead>
+        <tbody>
+        <tr><td>name</td><td>Zhang San</td><td>string</td><td>Yes</td><td>Full name of the user</td></tr>
+        <tr><td>account</td><td>123</td><td>string</td><td>Yes</td><td>Login account (phone/email)</td></tr>
+        <tr><td>password</td><td>123</td><td>string</td><td>Yes</td><td>Password</td></tr>
+        <tr><td>area_code</td><td>+86</td><td>string</td><td>No</td><td>Phone area code (required for phone registration)</td></tr>
+        </tbody>
+    </table>
+
+    <h3>Response Examples:</h3>
+    <h4>✅ Success:</h4>
+    <pre>
+{
+  "success": true,
+  "code": 200,
+  "msg": "Registration successful",
+  "data": {
+    "name": "Zhang San",
+    "area_code": "+86",
+    "account": "123456",
+    "uid": "e9f1df4a2a9c524ae436e8da42ba0fd7"
+  }
+}
+    </pre>
+    <h4>❌ Failure:</h4>
+    <pre>
+{
+  "success": false,
+  "code": 10022,
+  "msg": "Signature error",
+  "data": []
+}
+    </pre>
+</section>
+
+<section class="section">
+    <h2>2. 📦 Upload Order</h2>
+    <ul>
+        <li><strong>URL:</strong> <code>/appsapi/createOrder</code></li>
+        <li><strong>Method:</strong> POST</li>
+        <li><strong>Content-Type:</strong> form-data</li>
+    </ul>
+
+    <h3>Request Body:</h3>
+    <table>
+        <thead>
+        <tr><th>Parameter</th><th>Example Value</th><th>Type</th><th>Required</th><th>Description</th></tr>
+        </thead>
+        <tbody>
+        <tr><td>uid</td><td>2bdb2e1715d396b91a929e1c45886e6a</td><td>string</td><td>No</td><td>UID provided during registration</td></tr>
+        <tr><td>start_local</td><td>1</td><td>string</td><td>Yes</td><td>Origin location ID</td></tr>
+        <tr><td>target_local</td><td>1</td><td>string</td><td>Yes</td><td>Destination location ID</td></tr>
+        <tr><td>contact_name</td><td>123</td><td>string</td><td>No</td><td>Contact person's name</td></tr>
+        <tr><td>contact_tel</td><td>123</td><td>string</td><td>No</td><td>Contact person's phone</td></tr>
+        <tr><td>contact_addr</td><td>123</td><td>string</td><td>No</td><td>Pickup address</td></tr>
+        <tr><td>pickup_type</td><td>1</td><td>string</td><td>No</td><td>Pickup type: 1 (Self-pickup), 2 (Delivery)</td></tr>
+        <tr><td>pickup_name</td><td>123</td><td>string</td><td>No</td><td>Name of pickup person</td></tr>
+        <tr><td>pickup_tel</td><td>123</td><td>string</td><td>No</td><td>Phone of pickup person</td></tr>
+        <tr><td>pickup_addr</td><td>1311</td><td>string</td><td>No</td><td>Address of pickup person</td></tr>
+        <tr><td>goods</td><td>-</td><td>array</td><td>Yes</td><td>Goods information</td></tr>
+        <tr><td>goods.goods_name</td><td>Product Name</td><td>string</td><td>Yes</td><td>Name of the product</td></tr>
+        <tr><td>goods.goods_price</td><td>100</td><td>number</td><td>Yes</td><td>Price per unit</td></tr>
+        <tr><td>goods.goods_num</td><td>100</td><td>number</td><td>Yes</td><td>Quantity</td></tr>
+        <tr><td>packages</td><td>-</td><td>array</td><td>Yes</td><td>Package list</td></tr>
+        <tr><td>packages[].express_sn</td><td>123</td><td>string</td><td>Yes</td><td>Express tracking number</td></tr>
+        <tr><td>remark</td><td>-</td><td>string</td><td>No</td><td>Order remarks</td></tr>
+        </tbody>
+    </table>
+
+    <h3>Response Examples:</h3>
+    <h4>✅ Success:</h4>
+    <pre>
+{
+  "success": true,
+  "code": 200,
+  "msg": "Upload successful",
+  "data": [
+    {
+      "package_sn": "HT2507030000002-01",
+      "express_sn": "SF000000107"
+    },
+    {
+      "package_sn": "HT2507030000003-01",
+      "express_sn": "SF000000108"
+    },
+    {
+      "package_sn": "HT2507030000001-01",
+      "express_sn": "SF000000106"
+    }
+  ]
+}
+    </pre>
+    <h4>❌ Failure:</h4>
+    <pre>
+{
+  "success": false,
+  "code": 10022,
+  "msg": "Signature error",
+  "data": []
+}
+    </pre>
+</section>
+
+<section class="section">
+    <h2>3. 📍 Get Address List</h2>
+    <ul>
+        <li><strong>URL:</strong> <code>/appsapi/addressList</code></li>
+        <li><strong>Method:</strong> GET</li>
+    </ul>
+
+    <h3>Response Example:</h3>
+    <h4>✅ Success:</h4>
+    <pre>
+{
+  "success": true,
+  "code": 200,
+  "msg": "Successfully fetched",
+  "data": {
+    "start_local_arr": [
+      {
+        "id": "1",
+        "name": "Yiwu"
+      },
+      {
+        "id": "2",
+        "name": "Urumqi"
+      }
+    ],
+    "target_local_arr": [
+      {
+        "id": "21",
+        "name": "Tashkent"
+      },
+      {
+        "id": "22",
+        "name": "Tashkent 01"
+      }
+    ]
+  }
+}
+    </pre>
+</section>
+
+<section class="section">
+    <h2>4. ✅ Callback for Delivery Sign-off</h2>
+    <ul>
+        <li><strong>URL:</strong> *(Provided by receiver)*</li>
+        <li><strong>Method:</strong> POST</li>
+        <li><strong>Content-Type:</strong> form-data</li>
+    </ul>
+
+    <h3>Request Body:</h3>
+    <table>
+        <thead>
+        <tr><th>Parameter</th><th>Example Value</th><th>Type</th><th>Required</th><th>Description</th></tr>
+        </thead>
+        <tbody>
+        <tr><td>express_sn</td><td>123123</td><td>string</td><td>Yes</td><td>Tracking number of the package</td></tr>
+        <tr><td>height</td><td>123</td><td>number</td><td>No</td><td>Height in cm</td></tr>
+        <tr><td>width</td><td>123</td><td>number</td><td>No</td><td>Width in cm</td></tr>
+        <tr><td>length</td><td>123</td><td>number</td><td>No</td><td>Length in cm</td></tr>
+        <tr><td>volume</td><td>0.00510</td><td>number</td><td>Yes</td><td>Volume in cubic meters</td></tr>
+        <tr><td>weight</td><td>10</td><td>number</td><td>Yes</td><td>Weight in kg</td></tr>
+        <tr><td>freight_price</td><td>10</td><td>number</td><td>Yes</td><td>Freight price per unit</td></tr>
+        <tr><td>freight_cost</td><td>10</td><td>number</td><td>Yes</td><td>Total freight cost</td></tr>
+        </tbody>
+    </table>
+
+    <h3>Response Examples:</h3>
+    <h4>✅ Success:</h4>
+    <pre>
+{
+  "success": true,
+  "code": 200,
+  "msg": "Successfully signed for",
+}
+    </pre>
+    <h4>❌ Failure:</h4>
+    <pre>
+{
+  "success": false,
+  "code": 10022,
+  "msg": "Signature error",
+  "data": []
+}
+    </pre>
+</section>
+
+</body>
+</html>

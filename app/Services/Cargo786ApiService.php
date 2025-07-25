@@ -11,11 +11,12 @@ class Cargo786ApiService
     private string $accountKey;
     private string $clientSecret;
 
-    public function __construct(bool $useProduction = false)
+    public function __construct()
     {
-        $this->baseUrl = $useProduction ? self::PROD_BASE_URL : self::TEST_BASE_URL;
-        $this->accountKey = self::BAL_ACCOUNT_KEY;
-        $this->clientSecret = self::BAL_CLIENT_SECRET;
+        $useProduction = app()->environment('production');
+        $this->baseUrl = $useProduction ? env('PROD_BASE_URL') : env('TEST_BASE_URL');
+        $this->accountKey = env('BAL_ACCOUNT_KEY');
+        $this->clientSecret = env('BAL_CLIENT_SECRET');
     }
 
     /**
@@ -26,20 +27,26 @@ class Cargo786ApiService
      */
     private function generateSignature(array $parameters): string
     {
-        // Sort parameters by key name in ASCII order
+
+        if (isset($parameters['goods'])) {
+            $parameters['goods'] = json_encode($parameters['goods'], JSON_UNESCAPED_UNICODE);
+        }
+        if (isset($parameters['packages'])) {
+            $parameters['packages'] = json_encode($parameters['packages'], JSON_UNESCAPED_UNICODE);
+        }
         ksort($parameters, SORT_NATURAL | SORT_FLAG_CASE);
 
-        $signParts = [];
-        $signParts[] = $this->clientSecret;
-
+        // Формирование строки для подписи
+        $sign_parts = [$this->clientSecret];
         foreach ($parameters as $key => $value) {
-            $signParts[] = "{$key}{$value}";
+            $sign_parts[] = "{$key}{$value}";
         }
+        $sign_parts[] = $this->clientSecret;
 
-        $signParts[] = $this->clientSecret;
-        $signString = implode('', $signParts);
+        // Склеиваем без разделителей и генерируем MD5 подпись
+        $sign_string = implode("", $sign_parts);
+        return strtoupper(md5($sign_string));
 
-        return strtoupper(md5($signString));
     }
 
     /**
@@ -69,10 +76,12 @@ class Cargo786ApiService
     private function makeRequest(string $endpoint, array $data = [], string $method = 'POST', string $lang = 'ru'): array
     {
         $publicParams = $this->getPublicParameters($lang);
+        Log::info('Cargo786 API Public Parameters: ' . json_encode($publicParams));
         $allParams = array_merge($publicParams, $data);
 
         // Generate signature
         $signature = $this->generateSignature($allParams);
+        Log::info('Cargo786 API Signature: ' . $signature);
         $allParams['sign'] = $signature;
 
         $url = $this->baseUrl . $endpoint;
@@ -156,6 +165,7 @@ class Cargo786ApiService
      */
     public function createOrder(array $orderData, string $lang = 'ru'): array
     {
+
         return $this->makeRequest('/appsapi/createOrder', $orderData, 'POST', $lang);
     }
 

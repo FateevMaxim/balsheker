@@ -6,6 +6,7 @@ use App\Services\Cargo786ApiService;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Str;
 
 class Cargo786Controller extends Controller
 {
@@ -52,7 +53,11 @@ class Cargo786Controller extends Controller
             $validated['lang'] ?? 'ru'
         );
 
+        // Ensure status code is a valid HTTP status code (100-599)
         $statusCode = $result['success'] ? 200 : ($result['code'] ?? 500);
+        if (!is_numeric($statusCode) || $statusCode < 100 || $statusCode >= 600) {
+            $statusCode = 500;
+        }
 
         return response()->json($result, $statusCode);
     }
@@ -66,24 +71,7 @@ class Cargo786Controller extends Controller
     public function createOrder(Request $request): JsonResponse
     {
         $validator = Validator::make($request->all(), [
-            'uid' => 'nullable|string',
-            'start_local' => 'required|string',
-            'target_local' => 'required|string',
-            'contact_name' => 'nullable|string|max:255',
-            'contact_tel' => 'nullable|string|max:50',
-            'contact_addr' => 'nullable|string|max:500',
-            'pickup_type' => 'nullable|string|in:1,2',
-            'pickup_name' => 'nullable|string|max:255',
-            'pickup_tel' => 'nullable|string|max:50',
-            'pickup_addr' => 'nullable|string|max:500',
-            'goods' => 'required|array',
-            'goods.*.goods_name' => 'required|string|max:255',
-            'goods.*.goods_price' => 'required|numeric|min:0',
-            'goods.*.goods_num' => 'required|integer|min:1',
-            'packages' => 'required|array',
             'packages.*.express_sn' => 'required|string|max:255',
-            'remark' => 'nullable|string|max:1000',
-            'lang' => 'nullable|string|in:zh,kk,ru'
         ]);
 
         if ($validator->fails()) {
@@ -99,10 +87,15 @@ class Cargo786Controller extends Controller
         $validated = $validator->validated();
         $lang = $validated['lang'] ?? 'ru';
         unset($validated['lang']);
+        $validated['uuid'] = Str::uuid()->toString();
 
         $result = $this->cargo786Service->createOrder($validated, $lang);
 
+        // Ensure status code is a valid HTTP status code (100-599)
         $statusCode = $result['success'] ? 200 : ($result['code'] ?? 500);
+        if (!is_numeric($statusCode) || $statusCode < 100 || $statusCode >= 600) {
+            $statusCode = 500;
+        }
 
         return response()->json($result, $statusCode);
     }
@@ -133,7 +126,11 @@ class Cargo786Controller extends Controller
 
         $result = $this->cargo786Service->getAddressList($lang);
 
+        // Ensure status code is a valid HTTP status code (100-599)
         $statusCode = $result['success'] ? 200 : ($result['code'] ?? 500);
+        if (!is_numeric($statusCode) || $statusCode < 100 || $statusCode >= 600) {
+            $statusCode = 500;
+        }
 
         return response()->json($result, $statusCode);
     }
@@ -151,11 +148,14 @@ class Cargo786Controller extends Controller
         // Test with address list as it's a simple GET request
         $result = $this->cargo786Service->getAddressList($lang);
 
+        // Ensure we use a valid HTTP status code
+        $statusCode = 200; // Default status code for the test connection response
+
         return response()->json([
             'success' => $result['success'],
             'code' => $result['code'],
             'msg' => $result['success'] ? 'Connection successful' : 'Connection failed: ' . $result['msg'],
             'test_result' => $result
-        ]);
+        ], $statusCode);
     }
 }
