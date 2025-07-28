@@ -58,10 +58,14 @@
             </div>
         </div>
     </body>
+    <script>
+        $(document).ready(function(){
+            $('.phone').inputmask('+79999999999');
+        });
+    </script>
     <script src=”{{ asset('/sw.js') }}”>
 
     </script>
-
     <script>
 
         if (!navigator.serviceWorker.controller) {
