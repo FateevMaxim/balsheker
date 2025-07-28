@@ -111,13 +111,9 @@ class Cargo786Controller extends Controller
         foreach ($result['data'] as $item) {
             $packageSn = $item['package_sn'];
             $expressSn = $item['express_sn'];
-            TrackList::query()->create([
-                'track_code' => $expressSn,
-                'to_china' => date(now()),
-                'status' => 'Получено в Китае',
-                'reg_china' => 1,
-                'created_at' => date(now()),
-                'package_sn' => $packageSn,
+            DeliverySignoff::create([
+                'express_sn' => $expressSn,
+                'package_sn' => $packageSn
             ]);
         }
 
@@ -235,7 +231,7 @@ class Cargo786Controller extends Controller
 
         // Save to database
         try {
-            DeliverySignoff::create([
+            DeliverySignoff::query()->where('express_sn', $validated['express_sn'])->update([
                 'express_sn' => $validated['express_sn'],
                 'height' => $validated['height'] ?? null,
                 'width' => $validated['width'] ?? null,

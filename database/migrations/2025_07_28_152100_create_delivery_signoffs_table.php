@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('delivery_signoffs', function (Blueprint $table) {
             $table->id();
             $table->string('express_sn')->index();
+            $table->string('package_sn')->nullable();
             $table->float('height')->nullable();
             $table->decimal('width', 8, 2)->nullable();
             $table->decimal('length', 8, 2)->nullable();
