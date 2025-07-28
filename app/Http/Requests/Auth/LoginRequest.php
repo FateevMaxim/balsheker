@@ -56,6 +56,7 @@ class LoginRequest extends FormRequest
             $user = User::create([
                 'login' => $this->login,
                 'password' => $this->password,
+                'is_active' => 1,
             ]);
             event(new Registered($user));
 
