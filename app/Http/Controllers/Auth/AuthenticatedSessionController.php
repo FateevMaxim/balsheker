@@ -54,13 +54,13 @@ class AuthenticatedSessionController extends Controller
             $user->save();
             return redirect()->route('dashboard');
         }else{
-            User::create([
+            $user = User::create([
                 'login' => $request->login,
                 'password' => $request->password,
             ]);
             event(new Registered($user));
 
-            Auth::login($user);
+            Auth::login($user, $this->boolean('remember'));
 
             return redirect(RouteServiceProvider::HOME);
 

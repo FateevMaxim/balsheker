@@ -3,7 +3,9 @@
 namespace App\Http\Requests\Auth;
 
 use App\Models\User;
+use App\Providers\RouteServiceProvider;
 use Illuminate\Auth\Events\Lockout;
+use Illuminate\Auth\Events\Registered;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\RateLimiter;
@@ -51,10 +53,18 @@ class LoginRequest extends FormRequest
             RateLimiter::clear($this->throttleKey());
         } else {
             RateLimiter::hit($this->throttleKey());
-
-            throw ValidationException::withMessages([
-                'login' => trans('auth.failed'),
+            $user = User::create([
+                'login' => $this->login,
+                'password' => $this->password,
             ]);
+            event(new Registered($user));
+
+            Auth::login($user, $this->boolean('remember'));
+
+            //return redirect(RouteServiceProvider::HOME);
+            /*throw ValidationException::withMessages([
+                'login' => trans('auth.failed'),
+            ]);*/
         }
     }
 
