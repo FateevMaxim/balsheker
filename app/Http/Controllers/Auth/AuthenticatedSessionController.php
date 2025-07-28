@@ -6,8 +6,6 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Auth\LoginRequest;
 use App\Models\Configuration;
 use App\Models\User;
-use App\Providers\RouteServiceProvider;
-use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Route;
@@ -54,18 +52,8 @@ class AuthenticatedSessionController extends Controller
             $user->save();
             return redirect()->route('dashboard');
         }else{
-            $user = User::create([
-                'login' => $request->login,
-                'password' => $request->password,
-            ]);
-            event(new Registered($user));
-
-            Auth::login($user, $this->boolean('remember'));
-
-            return redirect(RouteServiceProvider::HOME);
-
-           /* $config = Configuration::query()->select('address', 'whats_app', 'title_text', 'address_two')->first();
-            return view('register-me')->with(compact( 'config'));*/
+            $config = Configuration::query()->select('address', 'whats_app', 'title_text', 'address_two')->first();
+            return view('register-me')->with(compact( 'config'));
         }
     }
 
