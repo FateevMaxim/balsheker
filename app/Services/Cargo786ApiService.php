@@ -25,28 +25,35 @@ class Cargo786ApiService
      * @param array $parameters All request parameters
      * @return string MD5 signature in uppercase
      */
+
+    /**
+     * Generate MD5 signature for API authentication
+     *
+     * @param array $parameters All request parameters
+     * @return string MD5 signature in uppercase
+     */
     private function generateSignature(array $parameters): string
     {
-
+        // Преобразуем массивы в JSON строки
         if (isset($parameters['goods'])) {
             $parameters['goods'] = json_encode($parameters['goods'], JSON_UNESCAPED_UNICODE);
         }
         if (isset($parameters['packages'])) {
             $parameters['packages'] = json_encode($parameters['packages'], JSON_UNESCAPED_UNICODE);
         }
-        ksort($parameters, SORT_NATURAL | SORT_FLAG_CASE);
+        ksort($parameters, SORT_NATURAL | SORT_FLAG_CASE); // сортировка по ключам в ASCII порядке
 
-        // Формирование строки для подписи
-        $sign_parts = [$this->clientSecret];
-        foreach ($parameters as $key => $value) {
-            $sign_parts[] = "{$key}{$value}";
+        $sign_parts = [];
+        $sign_parts[] = $this->clientSecret;
+        foreach ($parameters as $k => $v) {
+            $sign_parts[] = "{$k}{$v}";
         }
         $sign_parts[] = $this->clientSecret;
 
-        // Склеиваем без разделителей и генерируем MD5 подпись
         $sign_string = implode("", $sign_parts);
-        return strtoupper(md5($sign_string));
+        $sign = strtoupper(md5($sign_string));
 
+        return $sign;
     }
 
     /**

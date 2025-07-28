@@ -16,6 +16,7 @@ class TrackList extends Model
             'reg_client',
             'detail',
             'status',
+            'package_sn'
         ];
     protected $hidden =
         [

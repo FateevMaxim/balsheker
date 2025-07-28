@@ -25,4 +25,5 @@ Route::prefix('cargo786')->group(function () {
     Route::post('/create-order', [Cargo786Controller::class, 'createOrder']);
     Route::get('/address-list', [Cargo786Controller::class, 'getAddressList']);
     Route::get('/test-connection', [Cargo786Controller::class, 'testConnection']);
+    Route::post('/delivery-signoff', [Cargo786Controller::class, 'deliverySignoffCallback']);
 });
