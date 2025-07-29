@@ -48,8 +48,12 @@ class DashboardController extends Controller
             $count = count($tracks);
 
             $messages = Message::all();
+            $is_modal = false;
+            if (!Auth::user()->name || !Auth::user()->surname || !Auth::user()->city){
+                $is_modal = true;
+            }
 
-            return view('dashboard')->with(compact('tracks', 'count', 'messages', 'config'));
+            return view('dashboard')->with(compact('tracks', 'count', 'messages', 'config', 'cities', 'is_modal'));
         }elseif (Auth::user()->is_active === 1 && Auth::user()->type === 'stock'){
             $count = TrackList::query()->whereDate('to_china', Carbon::today())->count();
             return view('stock', ['count' => $count, 'config' => $config, 'qr' => $qrChina]);

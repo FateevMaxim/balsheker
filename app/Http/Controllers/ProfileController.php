@@ -29,16 +29,16 @@ class ProfileController extends Controller
     /**
      * Update the user's profile information.
      */
-    public function update(Request $request): RedirectResponse
+    public function update(Request $request): \Illuminate\Http\JsonResponse
     {
         $user = User::find($request->user()->id);
-        if(isset($request->all()["is_post"])){
-            $user->is_post = true;
-        }else{
-            $user->is_post = false;
-        }
+        $user->name = $request['name'];
+        $user->surname = $request['surname'];
+        $user->city = $request['city'];
         $user->save();
-        return Redirect::route('profile.edit')->with('status', 'profile-updated');
+        session()->flash('message', 'Данные успешно сохранены!');
+        return response()->json(['success' => true]);
+        //return Redirect::route('dashboard')->with('status', 'profile-updated');
     }
 
     /**

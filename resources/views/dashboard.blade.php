@@ -253,4 +253,92 @@
         </div>
     </div>
 
+
+
+    <!-- Модальное окно с формой, стилизованное с помощью Tailwind CSS -->
+    <div id="modal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden">
+        <div class="relative top-56 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-lg font-semibold">Заполните, пожалуйста поля ниже</h3>
+                <button id="closeModal" class="text-gray-400 hover:text-gray-600">&times;</button>
+            </div>
+            <div>
+                <form id="modalForm" action="{{ route('profile.update') }}" method="POST">
+                    @csrf
+                    <!-- Name -->
+                    <div>
+                        <x-input-label for="name" :value="__('Имя')" />
+                        <x-text-input id="name" class="block mt-1 w-full border-2" type="text" name="name" :value="old('name')" placeholder="Имя" required autofocus autocomplete="name" />
+                        <x-input-error :messages="$errors->get('name')" class="mt-2" />
+                    </div>
+                    <!-- Surname -->
+                    <div>
+                        <x-input-label for="surname" :value="__('Фамилия')" />
+                        <x-text-input id="surname" class="block mt-1 w-full border-2" type="text" name="surname" :value="old('surname')" placeholder="Фамилия" required autofocus autocomplete="surname" />
+                        <x-input-error :messages="$errors->get('surname')" class="mt-2" />
+                    </div>
+                    <!-- City -->
+                    <div class="mt-4 mb-5">
+                        <x-input-label for="city" :value="__('Город')" />
+                        <select id="city" name="city" class="block mt-1 w-full border-2 border-gray-300 rounded-md" required>
+                            @foreach($cities as $city)
+                                <option value="{{ $city->title }}" {{ old('city') == $city->title ? 'selected' : '' }}>
+                                    {{ $city->title }}
+                                </option>
+                            @endforeach
+
+                        </select>
+                    </div>
+                    <x-primary-button class="w-9/12 mx-auto">
+                        {{ __('Сохранить') }}
+                    </x-primary-button>
+                </form>
+            </div>
+        </div>
+    </div>
+
 </x-app-layout>
+<!-- JavaScript для управления модальным окном -->
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const modal = document.getElementById('modal');
+        const closeModal = document.getElementById('closeModal');
+        const modalForm = document.getElementById('modalForm');
+
+        // Проверяем параметр is_modal из контроллера
+        @if(isset($is_modal) && $is_modal)
+        modal.classList.remove('hidden');
+
+        // Закрытие модального окна по клику на крестик
+        closeModal.addEventListener('click', function() {
+            modal.classList.add('hidden');
+        });
+
+        // Обработчик отправки формы
+        modalForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            // Отправка формы через AJAX
+            fetch(this.action, {
+                method: 'POST',
+                body: new FormData(this),
+                headers: {
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                }
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        // Закрываем модальное окно
+                        modal.classList.add('hidden');
+                        // Выполняем редирект на dashboard
+                        window.location.href = '{{ route("dashboard") }}';
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+        });
+        @endif
+    });
+</script>
