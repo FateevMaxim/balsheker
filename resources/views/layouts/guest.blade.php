@@ -60,9 +60,14 @@
     </body>
     <script>
         $(document).ready(function(){
-            $('.phone').inputmask('+79999999999');
+            $('.phone').inputmask({
+                mask: '+79999999999',
+                clearIncomplete: true, // Clears input if not fully completed
+                greedy: true // Forces the mask to require all characters
+            });
         });
     </script>
+
     <script src=”{{ asset('/sw.js') }}”>
 
     </script>

@@ -40,7 +40,7 @@ class RegisteredUserController extends Controller
             'checkbox' => ['required'],
             'surname' => ['required', 'string', 'max:255'],
             'city' => ['required', 'string', 'max:255'],
-            'login' => ['required', 'string', 'max:16', 'unique:'.User::class],
+            'login' => ['required', 'string', 'max:12', 'min:12', 'unique:'.User::class],
             'password' => ['required', 'confirmed'],
         ]);
 

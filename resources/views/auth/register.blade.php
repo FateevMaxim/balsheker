@@ -34,7 +34,7 @@
         <div class="flex items-center">
 
         <div class="relative w-full">
-            <x-text-input id="login" class="block phone mt-1 w-full border-2" type="text" name="login" placeholder="8 701 775 7272" :value="old('login')" required autocomplete="login" />
+            <x-text-input id="login" class="block phone mt-1 w-full border-2" type="text" name="login" placeholder="+77471234567" :value="old('login')" required autocomplete="login" />
         </div>
         </div>
         <div class="flex items-center w-9/12 mx-auto">

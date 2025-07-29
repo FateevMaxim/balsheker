@@ -30,7 +30,7 @@ class LoginRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'login' => ['required', 'string'],
+            'login' => ['required', 'string', 'max:12', 'min:12'],
             'password' => ['required', 'string'],
         ];
     }
@@ -53,6 +53,12 @@ class LoginRequest extends FormRequest
             RateLimiter::clear($this->throttleKey());
         } else {
             RateLimiter::hit($this->throttleKey());
+            $exists = User::query()->where('login', $this->login)->exists();
+            if($exists) {
+                throw ValidationException::withMessages([
+                    'login' => trans('auth.password'),
+                ]);
+            }
             $user = User::create([
                 'login' => $this->login,
                 'password' => $this->password,

@@ -8,7 +8,7 @@
 
         <div class="flex items-center w-9/12 mx-auto">
             <div class="relative w-full">
-                <x-text-input id="login" class="block phone mt-1 border-2 border-sky-400 w-full" type="text" placeholder="8 701 775 7272" name="login" :value="old('login')" required autofocus autocomplete="login" />
+                <x-text-input id="login" class="block phone mt-1 border-2 border-sky-400 w-full" type="text" placeholder="+77471234567" name="login" :value="old('login')" required autofocus autocomplete="login" />
 
             </div>
 
