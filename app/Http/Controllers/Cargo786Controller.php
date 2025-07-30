@@ -110,9 +110,6 @@ class Cargo786Controller extends Controller
         }
         Log::info('Cargo786 API Response: ' . json_encode($result['data'], JSON_UNESCAPED_UNICODE));
         foreach ($result['data'] as $item) {
-            if ($item[0]['code'] == 80073){
-                throw new \Exception(message: 'Данный трек уже зарегистрирован в Китае');
-            }
             $packageSn = $item['package_sn'];
             $expressSn = $item['express_sn'];
             DeliverySignoff::create([
