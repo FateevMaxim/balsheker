@@ -108,7 +108,7 @@ class Cargo786Controller extends Controller
         if (!is_numeric($statusCode) || $statusCode < 100 || $statusCode >= 600) {
             $statusCode = 500;
         }
-
+dd($result['data']);
         if ($result['data']['code'] == 80073){
             throw new \Exception(message: 'Данный трек уже зарегистрирован в Китае');
         }
