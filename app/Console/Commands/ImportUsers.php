@@ -41,7 +41,7 @@ class ImportUsers extends Command
             User::create([
                 'name'      => $row['name'],
                 'surname'   => $row['surname'],
-                'login'     => $row['login'],
+                'login'     => '+'.$row['login'],
                 'city'      => $row['city'],
                 'is_active' => true,
                 'password'  => $row['password'],
