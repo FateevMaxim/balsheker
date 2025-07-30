@@ -7,6 +7,7 @@ use App\Services\Cargo786ApiService;
 use App\Models\DeliverySignoff;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 
@@ -108,6 +109,7 @@ class Cargo786Controller extends Controller
             $statusCode = 500;
         }
 
+        Log::info('Cargo786 API Response: ' . json_encode($result['data'], JSON_UNESCAPED_UNICODE));
         foreach ($result['data'] as $item) {
             $packageSn = $item['package_sn'];
             $expressSn = $item['express_sn'];
