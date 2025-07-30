@@ -108,12 +108,11 @@ class Cargo786Controller extends Controller
         if (!is_numeric($statusCode) || $statusCode < 100 || $statusCode >= 600) {
             $statusCode = 500;
         }
-dd($result['data']);
-        if ($result['data']['code'] == 80073){
-            throw new \Exception(message: 'Данный трек уже зарегистрирован в Китае');
-        }
         Log::info('Cargo786 API Response: ' . json_encode($result['data'], JSON_UNESCAPED_UNICODE));
         foreach ($result['data'] as $item) {
+            if ($item['code'] == 80073){
+                throw new \Exception(message: 'Данный трек уже зарегистрирован в Китае');
+            }
             $packageSn = $item['package_sn'];
             $expressSn = $item['express_sn'];
             DeliverySignoff::create([
