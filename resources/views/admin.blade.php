@@ -115,8 +115,13 @@
                             @elseif($user->block == true) style="background-color: rgb(205 51 51);"
                             @else style="background-color: rgb(194 194 194);" @endif>
                             <div class="grid grid-cols-3 gap-4">
-                                <div class="col-span-2 ml-5">
-                                    <span onclick="copyPass(this)" data-login="{{ $user->login }}" data-password="{{ $user->password }}" class="cursor-pointer">{{$user->login}}</span>
+                                <div class="col-span-2 ml-5 relative">
+                                    <span onclick="copyPass(this)" data-login="{{ $user->login }}" data-password="{{ $user->password }}" class="cursor-pointer hover:text-blue-600 transition-colors">
+                                        {{$user->login}}
+                                    </span>
+                                    <div id="copy-notification" class="hidden absolute top-0 left-full ml-2 bg-green-500 text-white text-sm px-3 py-1 rounded-md shadow-md z-10">
+                                        Пароль скопирован!
+                                    </div>
                                 </div>
                                     <div class="flex flex-row-reverse col-span-1">
                                         <li class="mr-4">
@@ -239,8 +244,18 @@
                     var password = element.getAttribute('data-password');
                     var loginPass = "Ваш номер: " + login + ", пароль: " + password;
                     navigator.clipboard.writeText(loginPass);
-                }
 
+                    // Показываем уведомление
+                    const notification = document.getElementById('copy-notification');
+                    notification.classList.remove('hidden');
+                    notification.classList.add('flex', 'items-center');
+
+                    // Скрываем уведомление через 2 секунды
+                    setTimeout(() => {
+                        notification.classList.add('hidden');
+                        notification.classList.remove('flex', 'items-center');
+                    }, 2000);
+                }
             </script>
         </div>
     </div>
