@@ -160,6 +160,7 @@ class DashboardController extends Controller
 
     public function archive ()
     {
+        $cities = City::query()->select('title')->get();
         $tracks = ClientTrackList::query()
             ->leftJoin('track_lists', 'client_track_lists.track_code', '=', 'track_lists.track_code')
             ->select( 'client_track_lists.track_code', 'client_track_lists.detail', 'client_track_lists.created_at','client_track_lists.id',
@@ -169,7 +170,7 @@ class DashboardController extends Controller
             ->get();
         $config = Configuration::query()->select('address', 'title_text', 'address_two')->first();
             $count = count($tracks);
-            return view('dashboard')->with(compact('tracks', 'count', 'config'));
+            return view('dashboard')->with(compact('tracks', 'count', 'config', 'cities'));
     }
 
     public function users ()
