@@ -9,8 +9,10 @@ class City extends Model
 {
     protected $fillable =
         [
-            'title',
-            'title_kz'
+            'name',
+            'city_id',
+            'is_active',
+            'sort',
         ];
     protected $hidden =
         [

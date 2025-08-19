@@ -11,6 +11,7 @@ class DeliverySignoff extends Model
 
     protected $fillable = [
         'express_sn',
+        'package_sn',
         'height',
         'width',
         'length',

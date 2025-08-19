@@ -162,7 +162,7 @@ class Cargo786Controller extends Controller
      * @param Request $request
      * @return JsonResponse
      */
-    public function testConnection(Request $request): JsonResponse
+    public function getCities(Request $request): JsonResponse
     {
         $lang = $request->input('lang', 'ru');
 

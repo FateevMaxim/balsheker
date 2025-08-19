@@ -10,7 +10,7 @@ use Illuminate\Http\Request;
 class ReportController extends Controller
 {
     public function getTrackReportPage(){
-        $cities = City::query()->select('title')->get();
+        $cities = City::query()->select('name')->get();
         $config = Configuration::query()->select('title_text')->first();
         $city = '';
         $date = '';
@@ -37,7 +37,7 @@ class ReportController extends Controller
             $query->where('status', 'LIKE', $request->status);
             $status = $request->status;
         }
-        $cities = City::query()->select('title')->get();
+        $cities = City::query()->select('name')->get();
         $tracks = $query->with('user')->get();
         $count = $tracks->count();
         $config = Configuration::query()->select('title_text')->first();

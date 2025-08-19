@@ -4,14 +4,19 @@ namespace App\Http\Controllers;
 
 use App\Exports\UsersExport;
 use App\Imports\TracksImport;
+use App\Models\City;
 use App\Models\ClientTrackList;
 use App\Models\Configuration;
+use App\Models\DeliverySignoff;
+use App\Models\FailedApiCall;
 use App\Models\TrackList;
 use App\Models\User;
+use App\Services\Cargo786ApiService;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use Maatwebsite\Excel\Facades\Excel;
 
@@ -244,6 +249,70 @@ class ProductController extends Controller
         $track_list->user_id = Auth::user()->id;
         $track_list->save();
 
+        // После успешного сохранения трек-кода, отправляем его в сторонний сервис
+        $user = Auth::user();
+
+        // Находим city_id из таблицы Cities по имени города пользователя
+        $city = City::where('name', $user->city)->first();
+
+        // Подготавливаем параметры для API
+        $orderData = [
+            'start_local' => '11',
+            'target_local' => (string)$city->city_id,
+            'packages' => [
+                [
+                    'express_sn' => $request["track_code"]
+                ]
+            ],
+            'goods' => [
+                'goods_name' => !empty($request["detail"]) ? $request["detail"] : 'Товар',
+                'goods_price' => 1,
+                'goods_num' => 1
+            ]
+        ];
+
+        try {
+            // Создаем экземпляр сервиса и вызываем API
+            $cargo786Service = app(Cargo786ApiService::class);
+            $result = $cargo786Service->createOrder($orderData, 'ru');
+
+            // Проверяем успешность ответа
+            if (!$result['success']) {
+                // Если ответ не успешный, сохраняем данные об ошибке в БД
+                FailedApiCall::create([
+                    'user_id' => $user->id,
+                    'login' => $user->login,
+                    'track_code' => $request["track_code"],
+                    'start_local' => '11',
+                    'target_local' => $city->city_id,
+                    'error_message' => json_encode($result['data'], JSON_UNESCAPED_UNICODE) ?? 'Unknown error'
+                ]);
+            }else{
+                foreach ($result['data'] as $item) {
+                    $packageSn = $item['package_sn'];
+                    $expressSn = $item['express_sn'];
+                    DeliverySignoff::create([
+                        'express_sn' => $expressSn,
+                        'package_sn' => $packageSn
+                    ]);
+                }
+            }
+
+            Log::info('Cargo786 API Response: ' . json_encode($result['data'], JSON_UNESCAPED_UNICODE));
+
+        } catch (\Exception $e) {
+            // Если произошла ошибка при вызове API, сохраняем информацию об ошибке
+            FailedApiCall::create([
+                'user_id' => $user->id,
+                'login' => $user->login,
+                'track_code' => $request["track_code"],
+                'start_local' => '11',
+                'target_local' => $city->city_id,
+                'error_message' => $e->getMessage()
+            ]);
+        }
+
+        // В любом случае возвращаем пользователю сообщение об успешном добавлении
         return redirect()->back()->with('message', 'Трек код успешно добавлен');
     }
 
