@@ -34,7 +34,7 @@ class DashboardController extends Controller
         $qrPavlodar = QrCodes::query()->select()->where('id', 14)->first();
         $qrBalhash = QrCodes::query()->select()->where('id', 15)->first();
         $config = Configuration::query()->select('address', 'title_text', 'address_two', 'whats_app')->first();
-        $cities = City::query()->select('name')->get();
+        $cities = City::query()->select('name')->orderByDesc('sort')->get();
         if (Auth::user()->is_active === 1 && Auth::user()->type === null){
             $tracks = ClientTrackList::query()
                 ->leftJoin('track_lists', 'client_track_lists.track_code', '=', 'track_lists.track_code')
@@ -160,7 +160,7 @@ class DashboardController extends Controller
 
     public function archive ()
     {
-        $cities = City::query()->select('name')->get();
+        $cities = City::query()->select('name')->orderByDesc('sort')->get();
         $tracks = ClientTrackList::query()
             ->leftJoin('track_lists', 'client_track_lists.track_code', '=', 'track_lists.track_code')
             ->select( 'client_track_lists.track_code', 'client_track_lists.detail', 'client_track_lists.created_at','client_track_lists.id',
