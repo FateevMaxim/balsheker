@@ -5,6 +5,7 @@ namespace App\Console\Commands;
 use App\Services\Cargo786ApiService;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class SyncCitiesCommand extends Command
 {
@@ -38,11 +39,16 @@ class SyncCitiesCommand extends Command
         $lang = $this->option('lang') ?? 'ru';
 
         $this->info('Starting cities synchronization...');
+        Log::info('Cities synchronization started', ['lang' => $lang]);
 
         $result = $this->cargo786Service->getAddressList($lang);
 
         if (!$result['success']) {
             $this->error('Failed to fetch cities from API: ' . $result['msg']);
+            Log::error('Cities synchronization failed to fetch from API', [
+                'lang' => $lang,
+                'error' => $result['msg'] ?? null,
+            ]);
             return;
         }
 
@@ -50,6 +56,9 @@ class SyncCitiesCommand extends Command
 
         if (empty($targetCities)) {
             $this->warn('No cities found in target_local_arr');
+            Log::warning('Cities synchronization found no cities in target_local_arr', [
+                'lang' => $lang,
+            ]);
             return;
         }
 
@@ -98,5 +107,13 @@ class SyncCitiesCommand extends Command
         $this->info("Cities updated: {$updated}");
         $this->info("Cities deleted: {$deleted}");
         $this->info("Total cities processed: " . count($targetCities));
+
+        Log::info('Cities synchronization completed', [
+            'lang' => $lang,
+            'added' => $synced,
+            'updated' => $updated,
+            'deleted' => $deleted,
+            'total' => count($targetCities),
+        ]);
     }
 }
