@@ -59,19 +59,10 @@ class LoginRequest extends FormRequest
                     'login' => trans('auth.password'),
                 ]);
             }
-            $user = User::create([
-                'login' => $this->login,
-                'password' => $this->password,
-                'is_active' => true,
-            ]);
-            event(new Registered($user));
 
-            Auth::login($user, $this->boolean('remember'));
-
-            //return redirect(RouteServiceProvider::HOME);
-            /*throw ValidationException::withMessages([
+            throw ValidationException::withMessages([
                 'login' => trans('auth.failed'),
-            ]);*/
+            ]);
         }
     }
 
