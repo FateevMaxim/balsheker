@@ -13,7 +13,7 @@ class Cargo786ApiService
 
     public function __construct()
     {
-        $useProduction = app()->environment('production');
+        $useProduction = app()->environment('prod');
         $this->baseUrl = $useProduction ? env('PROD_BASE_URL') : env('TEST_BASE_URL');
         $this->accountKey = env('BAL_ACCOUNT_KEY');
         $this->clientSecret = env('BAL_CLIENT_SECRET');
