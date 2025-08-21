@@ -24,7 +24,7 @@ class RegisteredUserController extends Controller
     public function create(): View
     {
         $config = Configuration::query()->select('agreement', 'whats_app')->first();
-        $cities = City::all();
+        $cities = City::query()->select('name')->where('is_active', true)->orderBy('sort')->get();;
         return view('auth.register')->with(compact( 'config', 'cities'));
     }
 

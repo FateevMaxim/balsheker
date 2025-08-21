@@ -47,7 +47,7 @@
                                     <select id="city" name="city" class="block w-full p-2 mb-6 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500" required>
                                         <option>Выберите город</option>
                                         @foreach($cities as $city)
-                                            <option value="{{ $city->title }}">{{ $city->title }}</option>
+                                            <option value="{{ $city->name }}">{{ $city->name }}</option>
                                         @endforeach
                                     </select>
                                     <x-primary-button class="mx-auto w-full" id="sendTracks">

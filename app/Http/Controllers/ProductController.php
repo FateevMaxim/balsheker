@@ -234,11 +234,11 @@ class ProductController extends Controller
 
     public function addClient(Request $request)
     {
-        // Проверка города пользователя: если Алматы, показываем сообщение и не сохраняем трек
+/*        // Проверка города пользователя: если Алматы, показываем сообщение и не сохраняем трек
         $user = Auth::user();
         if ($user && mb_strtolower(trim((string)$user->city)) === mb_strtolower('Алматы')) {
             return redirect()->route('dashboard')->with('almaty_notice', 'Для того чтобы добавить трек код нужно зарегистрироваться на сайте https://ordaexpress.kz и уже там добавить трек код');
-        }
+        }*/
 
         if (Str::length($request["track_code"]) > 100){
             return redirect()->back()->with('error', 'Неверный трек, пожалуйста, перепроверьте');
@@ -292,7 +292,7 @@ class ProductController extends Controller
                     'track_code' => $request["track_code"],
                     'start_local' => '11',
                     'target_local' => $city->city_id,
-                    'error_message' => json_encode($result['data'], JSON_UNESCAPED_UNICODE) ?? 'Unknown error'
+                    'error_message' => json_encode($result['data'], JSON_UNESCAPED_UNICODE).$result['msg'] ?? 'Unknown error'
                 ]);
             }else{
                 foreach ($result['data'] as $item) {
