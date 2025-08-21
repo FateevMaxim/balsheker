@@ -110,7 +110,7 @@
                 @endforeach
             @endif
 
-           {{-- @if(session()->has('almaty_notice'))
+            @if(session()->has('almaty_notice'))
                 <div id="almaty-modal" class="fixed inset-0 z-50 flex items-center justify-center bg-gray-900 bg-opacity-50">
                     <div class="relative bg-white rounded-lg shadow w-11/12 max-w-xl p-6">
                         <button type="button" aria-label="Close"
@@ -124,7 +124,7 @@
                         </div>
                     </div>
                 </div>
-            @endif--}}
+            @endif
 
             <div class="grid grid-cols-1 sm:grid-cols-3 ml-5 mr-5 gap-2">
 
