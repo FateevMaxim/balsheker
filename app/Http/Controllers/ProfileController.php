@@ -7,6 +7,7 @@ use App\Models\ClientTrackList;
 use App\Models\Configuration;
 use App\Models\Message;
 use App\Models\User;
+use App\Models\City;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -21,24 +22,32 @@ class ProfileController extends Controller
      */
     public function edit(Request $request): View
     {
+        $cities = City::query()->select('name')->where('is_active', true)->orderBy('sort')->get();
         return view('profile.edit', [
             'user' => $request->user(),
+            'cities' => $cities,
         ]);
     }
 
     /**
      * Update the user's profile information.
      */
-    public function update(Request $request): \Illuminate\Http\JsonResponse
+    public function update(Request $request): RedirectResponse
     {
         $user = User::find($request->user()->id);
-        $user->name = $request['name'];
-        $user->surname = $request['surname'];
-        $user->city = $request['city'];
+        // Update only the fields that are actually submitted to avoid overwriting with nulls
+        if ($request->filled('name')) {
+            $user->name = $request->input('name');
+        }
+        if ($request->filled('surname')) {
+            $user->surname = $request->input('surname');
+        }
+        if ($request->has('city')) {
+            $user->city = $request->input('city');
+        }
         $user->save();
         session()->flash('message', 'Данные успешно сохранены!');
-        return response()->json(['success' => true]);
-        //return Redirect::route('dashboard')->with('status', 'profile-updated');
+        return Redirect::route('dashboard')->with('status', 'profile-updated');
     }
 
     /**
