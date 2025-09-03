@@ -37,6 +37,14 @@
             </select>
             <x-input-error class="mt-2" :messages="$errors->get('city')" />
         </div>
-        <x-primary-button>{{ __('Сохранить') }}</x-primary-button>
+
+        <div class="flex items-center gap-4">
+            <x-primary-button>{{ __('Сохранить') }}</x-primary-button>
+            <a href="{{ route('dashboard') }}">
+                <x-secondary-button class="mx-auto w-full py-3">
+                    {{ __('Назад') }}
+                </x-secondary-button>
+            </a>
+        </div>
     </form>
 </section>
