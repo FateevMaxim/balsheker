@@ -243,13 +243,16 @@ class Cargo786Controller extends Controller
                 'freight_cost' => $validated['freight_cost']
             ]);
 
-            TrackList::query()->create([
-                'track_code' => $validated['express_sn'],
-                'to_china' => date(now()),
-                'status' => 'Получено в Китае',
-                'reg_china' => 1,
-                'created_at' => date(now()),
-            ]);
+            TrackList::query()->updateOrCreate(
+                [
+                    'track_code' => $validated['express_sn']
+                ],
+                [
+                    'to_china' => now(),
+                    'status' => 'Получено в Китае',
+                    'reg_china' => 1,
+                ]
+            );
 
             return response()->json([
                 'success' => true,
