@@ -234,12 +234,6 @@ class ProductController extends Controller
 
     public function addClient(Request $request)
     {
-        // Проверка города пользователя: если Алматы, показываем сообщение и не сохраняем трек
-        $user = Auth::user();
-        if ($user && mb_strtolower(trim((string)$user->city)) === mb_strtolower('Алматы')) {
-            return redirect()->route('dashboard')->with('almaty_notice', 'Для того чтобы добавить трек код нужно зарегистрироваться на сайте https://ordaexpress.kz и уже там добавить трек код');
-        }
-
         if (Str::length($request["track_code"]) > 100){
             return redirect()->back()->with('error', 'Неверный трек, пожалуйста, перепроверьте');
         }
