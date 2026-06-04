@@ -5,8 +5,6 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ReportController;
 use Illuminate\Support\Facades\Route;
-use Illuminate\Support\Facades\Artisan;
-use Illuminate\Http\Request;
 
 /*
 |--------------------------------------------------------------------------
@@ -75,19 +73,6 @@ Route::middleware('auth')->group(function () {
     Route::post('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
-    // Manual trigger for cities synchronization command
-    Route::get('/cities/sync', function (Request $request) {
-        $lang = $request->query('lang', 'ru');
-        $exitCode = Artisan::call('cities:sync', ['--lang' => $lang]);
-        $output = Artisan::output();
-
-        return response()->json([
-            'success' => $exitCode === 0,
-            'exit_code' => $exitCode,
-            'lang' => $lang,
-            'output' => $output,
-        ]);
-    })->name('cities.sync');
 });
 
 require __DIR__.'/auth.php';
