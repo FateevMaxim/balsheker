@@ -7,6 +7,13 @@ const preLoad = function () {
 
 self.addEventListener("install", function (event) {
     event.waitUntil(preLoad());
+    // Чтобы исправление доехало до уже установленных PWA сразу,
+    // а не после закрытия всех вкладок приложения.
+    self.skipWaiting();
+});
+
+self.addEventListener("activate", function (event) {
+    event.waitUntil(self.clients.claim());
 });
 
 const filesToCache = [
@@ -47,6 +54,13 @@ const returnFromCache = function (request) {
 };
 
 self.addEventListener("fetch", function (event) {
+    // POST/PUT/PATCH не трогаем: пересоздание запроса внутри service worker
+    // рвёт тело multipart/form-data (форма импорта теряла поле date),
+    // а offline-фолбэк для них всё равно бессмысленен.
+    if (event.request.method !== "GET") {
+        return;
+    }
+
     event.respondWith(checkResponse(event.request).catch(function () {
         return returnFromCache(event.request);
     }));

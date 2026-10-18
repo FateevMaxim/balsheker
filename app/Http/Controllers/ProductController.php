@@ -297,8 +297,24 @@ class ProductController extends Controller
 
     public function fileImport(Request $request)
     {
-        Excel::import(new TracksImport($request['date']), $request->file('file')->store('temp'));
-        return back();
+        // Тело запроса пришло, но PHP его не разобрал: превышен post_max_size
+        // либо multipart побился по дороге. В этом случае пусты и date, и file.
+        if (empty($request->all()) && (int) $request->server('CONTENT_LENGTH') > 0) {
+            return back()->withErrors([
+                'file' => 'Не удалось прочитать данные формы. Возможно, файл слишком большой — попробуйте загрузить ещё раз.',
+            ]);
+        }
+
+        $validated = $request->validate([
+            'date' => 'required|date',
+            'file' => 'required|file|mimes:xlsx,xls,csv,txt|max:10240',
+        ]);
+
+        $date = Carbon::parse($validated['date'])->toDateString();
+
+        Excel::import(new TracksImport($date), $request->file('file')->store('temp'));
+
+        return back()->with('message', 'Трек коды успешно загружены');
     }
 
     public function fileExport(Request $request)

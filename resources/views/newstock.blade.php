@@ -9,6 +9,14 @@
                     </div>
                 @endif
 
+                @if($errors->any())
+                    <div class="p-4 mb-4 text-sm text-red-800 rounded-lg bg-red-50 dark:bg-gray-800 dark:text-red-400" role="alert">
+                        @foreach($errors->all() as $error)
+                            <div class="font-medium">{{ $error }}</div>
+                        @endforeach
+                    </div>
+                @endif
+
                 <div class="grid grid-cols-1 md:grid-cols-2 h-22 pl-6 pr-6 pb-4">
 
                     <div class="p-4 round_border">
@@ -16,6 +24,7 @@
                             <h2>Загрузка трек кодов из Excel</h2>
                         </div>
                         <form method="POST" action="{{ route('file-import') }}" enctype="multipart/form-data">
+                            @csrf
                             <div>
                                 <div>
                                     <div class="relative w-full mt-2">
