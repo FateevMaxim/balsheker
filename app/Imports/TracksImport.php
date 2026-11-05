@@ -6,8 +6,9 @@ use App\Models\TrackList;
 use Maatwebsite\Excel\Concerns\Importable;
 use Maatwebsite\Excel\Concerns\SkipsOnError;
 use Maatwebsite\Excel\Concerns\ToModel;
+use Maatwebsite\Excel\Concerns\WithColumnLimit;
 
-class TracksImport implements ToModel, SkipsOnError
+class TracksImport implements ToModel, SkipsOnError, WithColumnLimit
 {
 
     use Importable;
@@ -16,6 +17,16 @@ class TracksImport implements ToModel, SkipsOnError
     public function __construct(string $date)
     {
         $this->date = $date;
+    }
+
+    /**
+     * Читаем только первые колонки: в файлах от поставщиков стили колонок
+     * бывают прописаны до XFD, и без лимита PhpSpreadsheet перебирает
+     * ~16k пустых ячеек на строку и падает по памяти.
+     */
+    public function endColumn(): string
+    {
+        return 'C';
     }
     /**
      * @param \Throwable $e
